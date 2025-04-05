@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 @Entity
 public class Product {
+    
+    @Id
     private final String id;
     private final String name;
     private final double price;
