@@ -1,23 +1,26 @@
 package com.ecommerce.concorrente.service;
-import java.util.List;
 
-import com.ecommerce.concorrente.models.Sale;
-import com.ecommerce.concorrente.repository.SaleRepository;
+import org.springframework.stereotype.Service;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Service
 public class SaleService {
 
-    private final SaleRepository saleRepository;
+    private final ConcurrentHashMap<String, AtomicInteger> salesReport = new ConcurrentHashMap<>();
 
+    public void registerSale(String productId, int quantity) {
+        salesReport.compute(productId, (id, prev) -> {
+            if (prev == null) return new AtomicInteger(quantity);
+            prev.addAndGet(quantity);
+            return prev;
+        });
 
-      public SaleService(SaleRepository saleRepository){  //nao sei se precisa isso aqui
-        this.saleRepository = saleRepository;
+        System.out.println("Mock: Registrando venda de " + quantity + " unidade(s) do produto " + productId);
     }
 
-
-    public List<Sale> getAllSales(){
-        return saleRepository.findAll();
-        
-
+    public ConcurrentHashMap<String, AtomicInteger> getSalesReport() {
+        return salesReport;
     }
-    
 }
